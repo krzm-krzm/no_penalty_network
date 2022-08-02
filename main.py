@@ -5,6 +5,7 @@ import math
 from itertools import product
 import matplotlib.pyplot as plt
 import random
+import time
 
 
 def distance(x1, x2, y1, y2):
@@ -460,7 +461,7 @@ if __name__ == '__main__':
     Distance = Setting_Info[3]  # 距離
     e = Setting_Info[4]  # early time
     l = Setting_Info[5]  # delay time
-    d = 10  # 乗り降りにようする時間
+    d = 5  # 乗り降りにようする時間
     noriori = Setting_Info[6]
 
     time_expand = 1
@@ -485,7 +486,7 @@ if __name__ == '__main__':
 
     kanryo_node = []
     pick_now_node_list =[]
-
+    t1 = time.time()
     while True:
         genzaichi = (0, 0)
         old_genzaichi = genzaichi
@@ -526,5 +527,6 @@ if __name__ == '__main__':
         kanryo_node = []
         if main_loop == len(loot):
             break
-
+    t2= time.time()
+    print(f"time:{t2 - t1}")
     print(G.nodes())
