@@ -572,6 +572,7 @@ if __name__ == '__main__':
     data = np.zeros((500,2))
     opt = 10000
     opt_loot =[]
+    misounyu =[]
     while True:
         G = copy.deepcopy(G_copy)
         main_loop = 0
@@ -619,6 +620,7 @@ if __name__ == '__main__':
             network_update(G, kanryo_node)
             main_loop += 1
             kanryo_node = []
+            misounyu.append(pick_now_node_list)
             if main_loop == len(loot):
                 break
 
@@ -634,4 +636,10 @@ if __name__ == '__main__':
             break
     print(loot)
     print(total_distance(opt_loot))
+    print(misounyu)
+    syaryo =0
+    for i in range(len(loot)):
+        if not loot[i] ==[]:
+            syaryo +=1
+    print(syaryo)
     #np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
