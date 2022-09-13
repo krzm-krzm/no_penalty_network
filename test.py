@@ -425,7 +425,9 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
                         idou_kanou.append(id[0])
                         idou_kanou_time.append(id[1])
                         idou_kakuritsu.append(list(info.values())[2])
-            random_return = probability_choice(now_location,idou_kanou,idou_kakuritsu,idou_kanou_time)
+            if not idou_kanou==[]:
+                random_return = saisyo(idou_kanou[idou_kanou_time.index(min(idou_kanou_time))],min(idou_kanou_time))
+
         elif noriori[now_location[0]] ==1:
             for id,info in dic.items():
                 if id[1] < now_location[1] + next_limit and not id[0] == n and id[0] not in kanryo_node and check_node(id):
@@ -472,7 +474,17 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
             random_return = probability_choice(now_location, idou_kanou, idou_kakuritsu, idou_kanou_time)
     else:
         pass
+
+    if random_return ==(0,0):
+        random_return =(n, T + 1)
     return random_return
+
+
+def saisyo(saisyo_kyaku,saisyo_time):
+    re_saisyo = [saisyo_kyaku,saisyo_time]
+    re_saisyo =tuple(re_saisyo)
+    return re_saisyo
+
 
 def total_distance(loot):
     Total = np.zeros(len(loot))
@@ -573,6 +585,7 @@ if __name__ == '__main__':
     opt = 10000
     opt_loot =[]
     misounyu =[]
+    misounyu_2 =[]
     while True:
         G = copy.deepcopy(G_copy)
         main_loop = 0
@@ -619,18 +632,11 @@ if __name__ == '__main__':
             #print(kanryo_node)
             network_update(G, kanryo_node)
             main_loop += 1
+            misounyu_2.append(kanryo_node)
             kanryo_node = []
             misounyu.append(pick_now_node_list)
-            if main_loop == len(loot):
+            if main_loop == 3:
                 break
-
-        if len(G.nodes())==2:
-            sum = np.sum(total_distance(loot))
-            if sum <=opt:
-                data[roop][0] = sum
-                data[roop][1] = daisu_check(loot)
-                opt_loot = loot
-                opt =sum
         roop +=1
         if roop ==1:
             break
@@ -642,4 +648,7 @@ if __name__ == '__main__':
         if not loot[i] ==[]:
             syaryo +=1
     print(syaryo)
+    kokyaku_node = range(1,49)
+    print(sum(misounyu_2,[]))
+    print(set(kokyaku_node)^set(sum(misounyu_2,[])))
     #np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
