@@ -413,7 +413,7 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
     idou_kakuritsu = []
     next_limit = Setting_Info_base[9]
     capa_max =Setting_Info_base[4]
-    saitan_drop_node = (n, T + 1)
+    saitan_drop_node = (n,T+1)
     random_return = (0, 0)
     if capacity < capa_max:
         if noriori[now_location[0]] ==0:
@@ -442,7 +442,8 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
                             idou_kanou.append(id[0])
                             idou_kanou_time.append(id[1])
                             idou_kakuritsu.append(list(info.values())[2])
-            random_return = probability_choice(now_location, idou_kanou, idou_kakuritsu, idou_kanou_time)
+
+            random_return = probability_choice(now_location, idou_kanou, idou_kakuritsu, idou_kanou_time,picking_list)
         elif noriori[now_location[0]] == -1:
             for id,info in dic.items():
                 if not picking_list ==[]:
@@ -471,7 +472,7 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
                                 idou_kanou.append(id[0])
                                 idou_kanou_time.append(id[1])
                                 idou_kakuritsu.append(list(info.values())[2])
-            random_return = probability_choice(now_location, idou_kanou, idou_kakuritsu, idou_kanou_time)
+            random_return = probability_choice(now_location, idou_kanou, idou_kakuritsu, idou_kanou_time,picking_list)
     else:
         pass
 
@@ -505,11 +506,37 @@ def daisu_check(loot):
             number +=1
     return number
 
-def probability_choice(now_location,idou_list,idou_probability,idou_kanou_time):
+def saitan_drop_kansu(idou_list,picking_list):
+    saitan_drop = []
+    idou_drop = list(set(idou_list) & set(picking_list))
+    saitan_loop = 0
+    for i in idou_drop:
+        if saitan_loop ==0:
+            saitan_drop =[i,l[i]]
+            saitan_loop =1
+        else:
+            if l[i] <saitan_drop[1]:
+                saitan_drop =[i,l[i]]
+    return saitan_drop
+
+def probability_choice(now_location,idou_list,idou_probability,idou_kanou_time,picking_list):
     if not idou_list == []:
         re_random =[]
+        idou_drop = list(set(idou_list) & set(picking_list))
+        shin_idou_list =[]
+        shin_idou_kanou_time=[]
+        shin_idou_probability =[]
+        if not idou_drop ==[]:
+            saitan_drop = saitan_drop_kansu(idou_list,picking_list)
+            for i in range(len(idou_list)):
+                if idou_kanou_time[i] <= saitan_drop[1]:
+                    shin_idou_list.append(idou_list[i])
+                    shin_idou_kanou_time.append(idou_kanou_time[i])
+                    shin_idou_probability.append(idou_probability[i])
+            idou_list =shin_idou_list
+            idou_kanou_time = shin_idou_kanou_time
+            idou_probability = shin_idou_probability
         kakuritsu_list = cal_kakuritsu(now_location,idou_list,pheromon=idou_probability)
-
         random=np.random.choice(idou_list,p=kakuritsu_list)
         index = idou_list.index(random)
         re_random.append(random)
@@ -525,11 +552,12 @@ def cal_kakuritsu(now_location,idou_list,pheromon):
     sum_sum =0
     for i in range(len(pheromon)):
         if noriori[idou_list[i]]==-1:
-            p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]])**beta)+1/(l[idou_list[i]]-e[idou_list[i]])
+            #p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]]+1/(l[idou_list[i]]-e[idou_list[i]]))**beta)#時間窓がヒューリスティック値
+            p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]])**beta)+1/(l[idou_list[i]]-now_location[0])#現在の時刻からの∆がヒューリスティック値
             kakuritsu_list.append(p)
             sum +=p
         else:
-            p = (pheromon[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta)
+            p = (pheromon[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]])+1/(l[idou_list[i]]-now_location[0]))**theta
             kakuritsu_list.append(p)
             sum += p
     for i in range(len(kakuritsu_list)):
@@ -567,7 +595,8 @@ if __name__ == '__main__':
     G_copy = copy.deepcopy(G)
 
     alpha =1
-    beta=1
+    beta=2
+    theta = 2
     Q =1
     print(FILENAME)
     print(time_expand)
@@ -635,7 +664,7 @@ if __name__ == '__main__':
             misounyu_2.append(kanryo_node)
             kanryo_node = []
             misounyu.append(pick_now_node_list)
-            if main_loop == 3:
+            if main_loop == Setting_Info_base[0]:
                 break
         roop +=1
         if roop ==1:

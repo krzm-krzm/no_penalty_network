@@ -13,7 +13,7 @@ def distance(x1, x2, y1, y2):
 
 def Setting(FILENAME):
     mat = []
-    with open('/home/kurozumi/デスクトップ/benchmark2/' + FILENAME, 'r', encoding='utf-8') as fin:
+    with open('/Users/kurozumi ryouho/Desktop/benchmark2/' + FILENAME, 'r', encoding='utf-8') as fin:
         for line in fin.readlines():
             row = []
             toks = line.split()
@@ -91,3 +91,8 @@ if __name__ == '__main__':
     total = total_distance(loot)
 
     print(total,np.sum(total))
+
+    a = [3,4,5,6]
+    b=[5,6,7]
+    c=list(set(a) & set(b))
+    print(c)
