@@ -546,7 +546,7 @@ def cal_kakuritsu(now_location,idou_list,pheromon):
     return kakuritsu_list
 
 if __name__ == '__main__':
-    FILENAME = 'darp01EX.txt'
+    FILENAME = 'darp02EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]
 
@@ -635,7 +635,7 @@ if __name__ == '__main__':
             misounyu_2.append(kanryo_node)
             kanryo_node = []
             misounyu.append(pick_now_node_list)
-            if main_loop == 3:
+            if main_loop == Setting_Info_base[0]:
                 break
         roop +=1
         if roop ==1:
@@ -648,7 +648,7 @@ if __name__ == '__main__':
         if not loot[i] ==[]:
             syaryo +=1
     print(syaryo)
-    kokyaku_node = range(1,49)
+    kokyaku_node = range(1,n)
     print(sum(misounyu_2,[]))
     print(set(kokyaku_node)^set(sum(misounyu_2,[])))
     #np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
