@@ -418,7 +418,7 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
     if capacity < capa_max:
         if noriori[now_location[0]] ==0:
             for id, info in dic.items():
-                if not id[0] == n and check_node(id) ==1:
+                if not id[0] == n and check_node(id) ==1 and id[0] not in kanryo_node:
                     if noriori[id[0]] ==1:
                         if id[0] in idou_kanou:
                             break
@@ -460,7 +460,7 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
                                 idou_kanou_time.append(id[1])
                                 idou_kakuritsu.append(list(info.values())[2])
                 else:
-                    if id[0] not in kanryo_node and check_node(id):
+                    if id[1] < now_location[1] + next_limit and id[0] not in kanryo_node and check_node(id):
                         if id[0] in idou_kanou:
                             break
                         if noriori[id[0]] == 1:
@@ -472,6 +472,21 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
                                 idou_kanou.append(id[0])
                                 idou_kanou_time.append(id[1])
                                 idou_kakuritsu.append(list(info.values())[2])
+            if picking_list ==[] and idou_kanou ==[]:
+                for id, info in dic.items():
+                    if not id[0] == n and id[0] not in kanryo_node and check_node(id):
+                        if id[0] in idou_kanou:
+                            break
+                        if noriori[id[0]] == 1:
+                            idou_kanou.append(id[0])
+                            idou_kanou_time.append(id[1])
+                            idou_kakuritsu.append(list(info.values())[2])
+                        else:
+                            if id[0] in picking_list:
+                                idou_kanou.append(id[0])
+                                idou_kanou_time.append(id[1])
+                                idou_kakuritsu.append(list(info.values())[2])
+
             random_return = probability_choice(now_location, idou_kanou, idou_kakuritsu, idou_kanou_time,picking_list)
     else:
         pass
@@ -598,10 +613,10 @@ def cal_kakuritsu(now_location,idou_list,pheromon):
     return kakuritsu_list
 
 if __name__ == '__main__':
-    FILENAME = 'darp02EX.txt'
+    FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]
-
+    Syaryo =int(Setting_Info_base[0])
     Syaryo_max_time = Setting_Info_base[8]
     T = int(Setting_Info_base[5])  # 時間数
     n = int(Setting_Info[1]) + 1  # デポを含めた頂点数
@@ -627,71 +642,73 @@ if __name__ == '__main__':
     print(time_expand)
     print(nx.number_of_edges(G))
     print(nx.number_of_nodes(G))
-    genzaichi = (0, 0)
-    old_genzaichi = genzaichi
     roop =0
     data = np.zeros((500,2))
     opt = 10000
     opt_loot =[]
     misounyu =[]
     misounyu_2 =[]
+
+    loop_nukedashi = np.zeros(3)
+
     while True:
         G = copy.deepcopy(G_copy)
         main_loop = 0
 
-        loot = [[] * 1 for i in range(10)]
-
-
+        loot = [[] * 1 for i in range(Syaryo)]
+        genzaichi_list =[(0,0) * 1 for i in range(Syaryo)]
+        old_genzaichi_list =[(0,0) * 1 for i in range(Syaryo)]
+        capa_list =[0 * 1 for i in range(Syaryo)]
+        syaryo_number =0
         kanryo_node = []
-        pick_now_node_list =[]
+        pick_now_node_list =[[] * 1 for i in range(Syaryo)]
         while True:
-            genzaichi = (0, 0)
-            old_genzaichi = genzaichi
-            capa =0
-            pick_now_node_list =[]
+            if syaryo_number >= Syaryo:
+                syaryo_number = 0
             while True:
-                setuzoku_Node = return_kakuritsu(G.adj[genzaichi], genzaichi,capa,pick_now_node_list)
+                if syaryo_number >= Syaryo:
+                    syaryo_number = 0
+                setuzoku_Node = return_kakuritsu(G.adj[genzaichi_list[syaryo_number]], genzaichi_list[syaryo_number],capa_list[syaryo_number],pick_now_node_list[syaryo_number])
                 if not setuzoku_Node[0] ==n:
-                    pick_now_node_list = update_pick_node(setuzoku_Node,pick_now_node_list)
+                    pick_now_node_list[syaryo_number] = update_pick_node(setuzoku_Node,pick_now_node_list[syaryo_number])
                     if noriori[setuzoku_Node[0]] ==1:
-                        capa +=1
+                        capa_list[syaryo_number] +=1
                     else:
-                        capa-=1
-                if pick_now_node_list == [] and syaryo_time_check(loot[main_loop]) >=Syaryo_max_time:
+                        capa_list[syaryo_number]-=1
+                if pick_now_node_list[syaryo_number] == [] and syaryo_time_check(loot[syaryo_number]) >=Syaryo_max_time:
+                    loop_nukedashi[syaryo_number] =1
                     break
                 if setuzoku_Node == (n, T + 1):
+                    loop_nukedashi[syaryo_number] =1
                     break
 
                 kanryo_node.append(setuzoku_Node[0])
 
-                old_genzaichi = genzaichi
-                genzaichi = setuzoku_Node
+                old_genzaichi_list[syaryo_number] = genzaichi_list[syaryo_number]
+                genzaichi_list[syaryo_number] = setuzoku_Node
 
-                loot[main_loop].append(genzaichi)
+                loot[syaryo_number].append(genzaichi_list[syaryo_number])
 
-                genzaichi = genzaichi_update(genzaichi)
-                loot[main_loop].append(genzaichi)
+                genzaichi_list[syaryo_number] = genzaichi_update(genzaichi_list[syaryo_number])
+                loot[syaryo_number].append(genzaichi_list[syaryo_number])
 
-                # if main_loop == 3:
-                #    break
+                syaryo_number += 1
 
-            #print(loot[main_loop])
-            #print(loot)
-            #print(syaryo_time_check(loot[main_loop]))
-            #print(kanryo_node)
-            network_update(G, kanryo_node)
-            main_loop += 1
-            misounyu_2.append(kanryo_node)
-            kanryo_node = []
-            misounyu.append(pick_now_node_list)
-            if main_loop == Setting_Info_base[0]:
+            if loop_nukedashi.sum() ==Syaryo:
                 break
+            syaryo_number +=1
+
+
+
+        misounyu_2.append(kanryo_node)
+
+
         roop +=1
         if roop ==1:
             break
     print(loot)
     print(total_distance(opt_loot))
-    print(misounyu)
+    print(pick_now_node_list)
     syaryo =0
     for i in range(len(loot)):
         if not loot[i] ==[]:

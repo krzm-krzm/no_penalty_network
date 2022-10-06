@@ -598,7 +598,7 @@ def cal_kakuritsu(now_location,idou_list,pheromon):
     return kakuritsu_list
 
 if __name__ == '__main__':
-    FILENAME = 'darp02EX.txt'
+    FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]
 
