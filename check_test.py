@@ -71,7 +71,7 @@ def total_distance(loot):
 
 
 if __name__ == '__main__':
-    FILENAME = 'darp01EX.txt'
+    FILENAME = 'darp02EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]
 
