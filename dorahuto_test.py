@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import random
 import time
 import copy
-
+import pickle
 
 def distance(x1, x2, y1, y2):
     d = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
@@ -627,10 +627,8 @@ if __name__ == '__main__':
     noriori = Setting_Info[6]
 
     time_expand = 1
-
-    G = network_creat(Time_expand=time_expand, kakucho=60)
-
-    G_copy = copy.deepcopy(G)
+    FILENAME = FILENAME.replace('.txt', '')
+    G= nx.read_gpickle('time_network'+FILENAME)
 
 
     check_misounyu =[]
@@ -655,7 +653,7 @@ if __name__ == '__main__':
         loop_nukedashi = np.zeros(3)
 
         while True:
-            G = copy.deepcopy(G_copy)
+            G = copy.deepcopy(G)
             main_loop = 0
 
             loot = [[] * 1 for i in range(Syaryo)]
