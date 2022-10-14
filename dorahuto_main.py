@@ -720,6 +720,19 @@ def min_route(route,riyoukokyaku_number,penalty_sum_list):
     return new_route
 
 def insert_remaining_node(Loot,drop_remaining_node,remaining_node,loot_without_time):#remaining_node:取り残されたノードのこと、drop_remaining_node:降ろすポイントだけ挿入できなかったノード
+    '''
+    残ったノードを挿入する関数
+    :param Loot: list
+        総ルート
+    :param drop_remaining_node:list
+        残っている降ろすノード
+    :param remaining_node: list
+        残っているpick_upノード
+    :param loot_without_time: list
+        総ルート(時間情報がない)
+    :return:
+        loot_without_time,penalty_list,penalty_sum_list
+    '''
     diff_remaining_node = sorted(list(set(remaining_node)^set(sum(drop_remaining_node,[]))))
     print(diff_remaining_node)
     penalty_sum_list =[]
@@ -742,15 +755,15 @@ def insert_remaining_node(Loot,drop_remaining_node,remaining_node,loot_without_t
     print(loot_without_time)
     print(penalty_list)
     print(penalty_sum_list)
-    return 1
+    return loot_without_time,penalty_list,penalty_sum_list
 
 
 if __name__ == '__main__':
     FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
-    Setting_Info_base = Setting_Info[0]
-    Syaryo =int(Setting_Info_base[0])
-    Syaryo_max_time = Setting_Info_base[8]
+    Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
+    Syaryo =int(Setting_Info_base[0]) #車両数
+    Syaryo_max_time = Setting_Info_base[8] #車両の最大稼働時間
     T = int(Setting_Info_base[5])  # 時間数
     n = int(Setting_Info[1]) + 1  # デポを含めた頂点数
     Request = int((n - 1) / 2)  # リクエスト数
@@ -758,20 +771,21 @@ if __name__ == '__main__':
     e = Setting_Info[4]  # early time
     l = Setting_Info[5]  # delay time
     d = 5  # 乗り降りにようする時間
-    noriori = Setting_Info[6]
+    noriori = Setting_Info[6] #乗り降り0-1決定変数
 
     time_expand = 1
 
     G = network_creat(Time_expand=time_expand, kakucho=60)
 
     G_copy = copy.deepcopy(G)
-
+#----------------------パラメータ-------------------------------------
     alpha =1
     beta=1
     theta = 1
     ganma =0.7
     keisu=np.ones(4)
     Q =1
+    pheromon = np.ones((n,n))
     print(FILENAME)
     print(time_expand)
     print(nx.number_of_edges(G))
