@@ -60,7 +60,16 @@ def Setting(FILENAME):
     return Setting_Info, request_number, depo_zahyo, c, e, l, noriori
 
 
+
 def network_creat(Time_expand, kakucho):
+    '''
+    :param Time_expand: int
+        時空間ネットワークの間隔 T
+    :param kakucho: int
+        最遅時間窓にプラスするノードの数
+    :return: G
+        時空間ネットワーク
+    '''
     G = nx.DiGraph()  # ノード作成
     for i in range(n):
         early_time = e[i]
@@ -181,6 +190,12 @@ def network_creat(Time_expand, kakucho):
 
 
 def check_node(next_location_id):
+    '''
+    移動先候補のノードが接続されているかどうかをチェックする関数
+    :param next_location_id: tuple
+        次の移動先候補のノード
+    :return: 0-1変数
+    '''
     flag = 1
     next_location_id = genzaichi_update(next_location_id)
     try:
@@ -192,25 +207,42 @@ def check_node(next_location_id):
 
 
 def genzaichi_update(tup):
+    '''
+    現在地にサービス時間をプラスする関数
+    :param tup: tuple
+        現在地のノード
+    :return: tuple
+        次のノード
+    '''
     tup_new = list(tup)
     tup_new[1] = tup_new[1] + d
     return tuple(tup_new)
 
 
 def syaryo_time_check(Loot):
+    '''
+    車両の稼働時間を計算する関数
+    :param Loot:list
+        一台のルート
+    :return: float
+        車両の稼働時間
+    '''
     syaryo_time = 0
     if not Loot == []:
         syaryo_time = Loot[-1][1] + Distance[0][Loot[-1][0]] - (Loot[0][1] - Distance[0][Loot[0][0]])
     return syaryo_time
 
-def sharing_number_count(Loot):
-    number_count=0
-    for i in Loot:
-        number_count+=noriori[i]
-
-    return  number_count
 
 def update_pick_node(next_node,pick_list):
+    '''
+    降ろさなければならないノードを管理しておく関数
+    :param next_node: tuple
+        現在のノード
+    :param pick_list:list
+         降ろさなければならないノードのリスト
+    :return: list
+        更新後の降ろさなければならないノードのリスト
+    '''
     if noriori[next_node[0]] ==1:
         pick_list.append(next_node[0]+Request)
     else:
@@ -226,36 +258,37 @@ def update_pick_node(next_node,pick_list):
 
 
 def network_update(network, removenode):
+    '''
+    10/12 使っていない関数
+    時空間ネットワークから指定のノードを削除するノード
+    :param network: network.X
+        時空間ネットワーク
+    :param removenode: list
+        消すべきノードリスト
+    :return:
+    '''
     for i in list(network.nodes()):
         for j in removenode:
             if i[0] == j:
                 network.remove_node(i)
 
 
-'''
-return_random関数に関して
-内容：接続可能なノード一覧からランダムで移動するノード（タプル型）を返す関数
-備考：接続ノード番号をランダムでチョイスしてその中で最も時間が早いノードを返している
-これから：①ピックアップノードが現在地として入力されたとき、乗車客が定員以下の場合は、ピックアップノード+これまで乗せた乗車客のドロップノードの中から選択
-        ②ピックアップノードが現在地かつ乗車客が定員Maxの場合は、乗せている乗車客のドロップノードから選択⇒ここはランダムで選択しなくて良い、最も締め切り時間に近いのを選択
-        ③ドロップノードが現在地のとき、ピックアップノードor今乗せている乗車客のドロップノードの中から選択
-        例外処理：移動可能なノードがない場合デポを返す
-'''
-
-def drop_check(picking_list,next_location):
-    flag=0
-    if not picking_list ==[]:
-        dic = G.adj[next_location]
-        for id,info in dic.items():
-            if id[0] in picking_list:
-                flag +=1
-    else:
-        flag +=1
-
-    return flag
 
 
 def return_kakuritsu(dic, now_location,capacity,picking_list):
+    '''
+    次のノードを確立で選択し、返す関数
+    :param dic: G.adj[genzaichi]
+        現在地から移動できるノードの一覧
+    :param now_location: tuple
+        現在地
+    :param capacity: int
+        キャパ
+    :param picking_list:list
+        降ろさなければならないノード
+    :return: tuple
+        次のノード
+    '''
     idou_kanou = []
     idou_kanou_time=[]
     idou_kakuritsu = []
@@ -345,12 +378,28 @@ def return_kakuritsu(dic, now_location,capacity,picking_list):
 
 
 def saisyo(saisyo_kyaku,saisyo_time):
+    '''
+    移動可能な最小ノードをタプル型で返す関数
+    :param saisyo_kyaku:int
+        移動先のノード番号
+    :param saisyo_time:int
+        移動先のノード時間
+    :return:tuple
+        ノード
+    '''
     re_saisyo = [saisyo_kyaku,saisyo_time]
     re_saisyo =tuple(re_saisyo)
     return re_saisyo
 
 
 def total_distance(loot):
+    '''
+    総車両の移動距離を返す関数
+    :param loot: list
+        タクシーすべてのルート
+    :return:float
+        距離
+    '''
     Total = np.zeros(len(loot))
 
     for i in range(len(loot)):
@@ -362,65 +411,28 @@ def total_distance(loot):
                 Total[i] += kyori
     return Total
 
-def daisu_check(loot):
-    number = 0
-    for i in range(len(loot)):
-        if not len(loot[i])==0:
-            number +=1
-    return number
 
-def saitan_drop_kansu(idou_list,picking_list):
-    saitan_drop = []
-    idou_drop = list(set(idou_list) & set(picking_list))
-    saitan_loop = 0
-    for i in idou_drop:
-        if saitan_loop ==0:
-            saitan_drop =[i,l[i]]
-            saitan_loop =1
-        else:
-            if l[i] <saitan_drop[1]:
-                saitan_drop =[i,l[i]]
-    return saitan_drop
 
 def probability_choice(now_location,idou_list,idou_probability,idou_kanou_time,picking_list):
     '''
-
-        if not idou_list == []:
-        re_random =[]
-        idou_drop = list(set(idou_list) & set(picking_list))
-        shin_idou_list =[]
-        shin_idou_kanou_time=[]
-        shin_idou_probability =[]
-        if not idou_drop ==[]:
-            saitan_drop = saitan_drop_kansu(idou_list,picking_list)
-            for i in range(len(idou_list)):
-                if idou_kanou_time[i] <= saitan_drop[1]:
-                    shin_idou_list.append(idou_list[i])
-                    shin_idou_kanou_time.append(idou_kanou_time[i])
-                    shin_idou_probability.append(idou_probability[i])
-            idou_list =shin_idou_list
-            idou_kanou_time = shin_idou_kanou_time
-            idou_probability = shin_idou_probability
-        kakuritsu_list = cal_kakuritsu(now_location,idou_list,pheromon=idou_probability)
-        random=np.random.choice(idou_list,p=kakuritsu_list)
-        index = idou_list.index(random)
-        re_random.append(random)
-        re_random.append(idou_kanou_time[index])
-        re_random =tuple(re_random)
-    else:
-        re_random =(n,T+1)
-    return re_random
-
-    :param now_location:
-    :param idou_list:
-    :param idou_probability:
-    :param idou_kanou_time:
-    :param picking_list:
-    :return:
+    return_kakuritsu関数  →   probability_choice関数  →   cal_kakuritsu関数
+    橋渡し的な関数
+    :param now_location:tuple
+        現在地
+    :param idou_list:list
+        移動候補ノードリスト
+    :param idou_probability:list
+        移動候補ノードの移動しやすさリスト、中身は1/(移動先の時間ー現在の時間)
+    :param idou_kanou_time:list
+        移動候補ノードの時間リスト
+    :param picking_list:list
+        降ろさなければならないリスト
+    :return:tuple
+        次のノード
     '''
     if not idou_list == []:
         re_random =[]
-        kakuritsu_list = cal_kakuritsu(now_location,idou_list,pheromon=idou_probability)
+        kakuritsu_list = cal_kakuritsu(now_location,idou_list,idou_probability)
 
         random=np.random.choice(idou_list,p=kakuritsu_list)
         index = idou_list.index(random)
@@ -431,19 +443,30 @@ def probability_choice(now_location,idou_list,idou_probability,idou_kanou_time,p
         re_random =(n,T+1)
     return re_random
 
-def cal_kakuritsu(now_location,idou_list,pheromon):
+def cal_kakuritsu(now_location, idou_list, idou_probability):
+    '''
+    確率を計算する関数
+    :param now_location:tuplw
+        現在地
+    :param idou_list: list
+        移動候補リスト
+    :param idou_probability:list
+        移動候補ノードの移動しやすさリスト、中身は1/(移動先の時間ー現在の時間)
+    :return: list
+        確率リスト
+    '''
     kakuritsu_list =[]
     sum=0
     sum_sum =0
-    for i in range(len(pheromon)):
+    for i in range(len(idou_probability)):
         if noriori[idou_list[i]]==-1:
             #p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]]+1/(l[idou_list[i]]-e[idou_list[i]]))**beta)#時間窓がヒューリスティック値
-            p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]])**beta)*(1/(l[idou_list[i]]-now_location[0]))**ganma #現在の時刻からの∆がヒューリスティック値
+            p = (idou_probability[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma #現在の時刻からの∆がヒューリスティック値
             #p = ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma
             kakuritsu_list.append(p)
             sum +=p
         else:
-            p = (pheromon[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]])**beta * (1/(l[idou_list[i]]-now_location[0]))**theta
+            p = (idou_probability[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
             #p = (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
             kakuritsu_list.append(p)
             sum += p
@@ -465,6 +488,13 @@ def cal_kakuritsu(now_location,idou_list,pheromon):
 
 
 def route_k_cost_sum(route_k):
+    '''
+    一台のルートの距離コストを計算
+    :param route_k:list
+        タクシー1台のルート
+    :return:float
+        タクシー1台の距離コスト
+    '''
     route_k_sum = 0
     for i in range(len(route_k) - 1):
         route_k_sum = route_k_sum + Distance[route_k[i]][route_k[i + 1]]
@@ -474,6 +504,13 @@ def route_k_cost_sum(route_k):
     return route_k_sum
 
 def capacity_route_k(route_k):
+    '''
+    タクシー1台のキャパシティオーバーを計算
+    :param route_k: list
+        タクシー1台のルート
+    :return: int
+        タクシー1台のキャパオーバー数
+    '''
     capacity_over = 0
     q = 0
     for i in range(len(route_k)):
@@ -483,6 +520,13 @@ def capacity_route_k(route_k):
     return capacity_over
 
 def time_caluculation(Route_k):
+    '''
+    タクシー１台の各タイム計算
+    :param Route_k:list
+        タクシー1台のルート
+    :return: list
+        タクシー1台のルートに関しての各タイム計算
+    '''
     B = np.zeros(n + 2, dtype=float, order='C')  # サービス開始時間（e.g., 乗せる時間、降ろす時間)
     A = np.zeros(n + 2, dtype=float, order='C')  # ノード到着時間
     D = np.zeros(n + 2, dtype=float, order='C')  # ノード出発時間
@@ -508,6 +552,15 @@ def time_caluculation(Route_k):
     return A, B, D, W, L
 
 def time_window_penalty(route_k, b):  # 論文でのw(s)
+    '''
+    時間窓制約違反の合計を返す関数
+    :param route_k:list
+        タクシー1台のルート
+    :param b:list
+        サービス開始時間
+    :return: flaot
+        時間窓制約違反の合計
+    '''
     sum = 0
     for i in range(len(route_k)):
         a = b[route_k[i]] - l[route_k[i]]
@@ -520,6 +573,13 @@ def time_window_penalty(route_k, b):  # 論文でのw(s)
 
 
 def ride_time_penalty(L):  # 論文でのt_s
+    '''
+    顧客一人の乗車時間違反を返す関数
+    :param L:list
+        乗客の乗車時間リスト
+    :return: flaot
+        顧客一人の乗車時間違反の合計
+    '''
     sum = 0
     for i in range(len(L)):
         a = L[i] - Setting_Info_base[9]
@@ -528,6 +588,13 @@ def ride_time_penalty(L):  # 論文でのt_s
     return sum
 
 def penalty_sum_route_k(route_k):
+    '''
+    タクシー１台のルートの各ペナルティコスト計算関数
+    :param route_k: list
+        タクシー1台のルート
+    :return: list
+        各ペナルティーをリストにしたもの
+    '''
     c_s = route_k_cost_sum(route_k)
     q_s = capacity_route_k(route_k)
     d_s = 0
@@ -545,8 +612,98 @@ def penalty_sum_route_k(route_k):
     penalty =[c_s,q_s,d_s,w_s,t_s]
     return penalty
 
+def insert_route_ver2(route, riyoukyakunumber, new_vehiclenumber):
+    '''
+    ルートに挿入する関数
+    :param route:list
+        すべてのルート
+    :param riyoukyakunumber:int
+        挿入する顧客の番号
+    :param new_vehiclenumber:int
+        挿入先の車両番号
+    :return:list
+        挿入した１台のルート
+    '''
+    new_route_k = copy.deepcopy(route[new_vehiclenumber])
+    route_k_node = len(route[new_vehiclenumber])
+    riyoukyakunumber = int(riyoukyakunumber)
+    new_route_k.insert(0, riyoukyakunumber)
+    new_route_k.insert(1, riyoukyakunumber + Request)
+    penalty = sum(penalty_sum_route_k(new_route_k))
+    check_route = copy.deepcopy(route[new_vehiclenumber])
+    for i in range(route_k_node):
+        j = i + 1
+        while j <= route_k_node:
+            check_route = copy.deepcopy(route[new_vehiclenumber])
+            check_route.insert(i, riyoukyakunumber)
+            check_route.insert(j, riyoukyakunumber + Request)
+            check_penalty = sum(penalty_sum_route_k(check_route))
+            if check_penalty < penalty:
+                penalty = check_penalty
+                new_route_k = copy.deepcopy(check_route)
+            j = j + 1
+        if j == route_k_node + 1:
+            check_route = copy.deepcopy(route[new_vehiclenumber])
+            check_route.insert(i, riyoukyakunumber)
+            check_route.append(riyoukyakunumber + Request)
+            check_penalty = sum(penalty_sum_route_k(check_route))
+            if check_penalty < penalty:
+                penalty = check_penalty
+                new_route_k = copy.deepcopy(check_route)
+    check_route = copy.deepcopy(route[new_vehiclenumber])
+    check_route.append(riyoukyakunumber)
+    check_route.append(riyoukyakunumber + Request)
+    check_penalty = sum(penalty_sum_route_k(check_route))
+    if check_penalty < penalty:
+        penalty = check_penalty
+        new_route_k = copy.deepcopy(check_route)
+
+    return new_route_k
+
+def min_route(route,riyoukokyaku_number,penalty_sum_list):
+    '''
+    挿入して総コストが最小となるルートをつくる関数
+    :param route: list
+        すべてのルート
+    :param riyoukokyaku_number: int
+        挿入する顧客番号
+    :param penalty_sum_list:list
+        各ルートのペナルティをまとめたlist
+    :return: list
+        新たなルート
+    '''
+    check_route=copy.deepcopy(route)
+    penalty=sum(penalty_sum_list)
+    new_route=copy.deepcopy(route)
+    count=0
+    for i in range(len(route)):
+        check_route=copy.deepcopy(route)
+        new_penalty_sum_list = copy.deepcopy(penalty_sum_list)
+        check_route[i] = insert_route_ver2(route,riyoukokyaku_number,i)
+        new_penalty_sum_list[i] =sum(penalty_sum_route_k(check_route[i]))
+        if count==0:
+            penalty = sum(new_penalty_sum_list)
+            new_route = copy.deepcopy(check_route)
+            count+=1
+        elif sum(new_penalty_sum_list) < penalty:
+             penalty=sum(new_penalty_sum_list)
+             new_route = copy.deepcopy(check_route)
+    return new_route
 
 def insert_remaining_node(Loot,drop_remaining_node,remaining_node,loot_without_time):#remaining_node:取り残されたノードのこと、drop_remaining_node:降ろすポイントだけ挿入できなかったノード
+    '''
+    残ったノードを挿入する関数
+    :param Loot: list
+        総ルート
+    :param drop_remaining_node:list
+        残っている降ろすノード
+    :param remaining_node: list
+        残っているpick_upノード
+    :param loot_without_time: list
+        総ルート(時間情報がない)
+    :return:
+        loot_without_time,penalty_list,penalty_sum_list
+    '''
     diff_remaining_node = sorted(list(set(remaining_node)^set(sum(drop_remaining_node,[]))))
     print(diff_remaining_node)
     penalty_sum_list =[]
@@ -560,15 +717,24 @@ def insert_remaining_node(Loot,drop_remaining_node,remaining_node,loot_without_t
         penalty_sum_list.append(sum(penalty_list[i]))
     print(loot_out_time)
     print(penalty_list,penalty_sum_list)
-    return 1
+    for i in remaining_node:
+        if i <=Request:
+            loot_without_time = min_route(route=loot_without_time,riyoukokyaku_number=i,penalty_sum_list=penalty_sum_list)
+    for j in range(len(loot_without_time)):
+        penalty_list[j] = penalty_sum_route_k(loot_without_time[j])
+        penalty_sum_list[j] = sum(penalty_list[j])
+    print(loot_without_time)
+    print(penalty_list)
+    print(penalty_sum_list)
+    return loot_without_time,penalty_list,penalty_sum_list
 
 
 if __name__ == '__main__':
     FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
-    Setting_Info_base = Setting_Info[0]
-    Syaryo =int(Setting_Info_base[0])
-    Syaryo_max_time = Setting_Info_base[8]
+    Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
+    Syaryo =int(Setting_Info_base[0]) #車両数
+    Syaryo_max_time = Setting_Info_base[8] #車両の最大稼働時間
     T = int(Setting_Info_base[5])  # 時間数
     n = int(Setting_Info[1]) + 1  # デポを含めた頂点数
     Request = int((n - 1) / 2)  # リクエスト数
@@ -576,20 +742,23 @@ if __name__ == '__main__':
     e = Setting_Info[4]  # early time
     l = Setting_Info[5]  # delay time
     d = 5  # 乗り降りにようする時間
-    noriori = Setting_Info[6]
+    noriori = Setting_Info[6] #乗り降り0-1決定変数
 
     time_expand = 1
 
-    G = network_creat(Time_expand=time_expand, kakucho=60)
+    FILENAME = FILENAME.replace('.txt', '')
+    G = nx.read_gpickle('time_network' + FILENAME)
 
     G_copy = copy.deepcopy(G)
-
+#----------------------パラメータ-------------------------------------
     alpha =1
     beta=1
     theta = 1
     ganma =0.7
     keisu=np.ones(4)
     Q =1
+    pheromon = np.ones((n,n))
+#-----------------------------------------------------------------
     print(FILENAME)
     print(time_expand)
     print(nx.number_of_edges(G))
