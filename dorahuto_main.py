@@ -461,12 +461,12 @@ def cal_kakuritsu(now_location, idou_list, idou_probability):
     for i in range(len(idou_probability)):
         if noriori[idou_list[i]]==-1:
             #p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]]+1/(l[idou_list[i]]-e[idou_list[i]]))**beta)#時間窓がヒューリスティック値
-            p = (idou_probability[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma #現在の時刻からの∆がヒューリスティック値
+            p = (idou_probability[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * ((1 / (l[idou_list[i]] - now_location[0])) ** ganma) * (pheromon[now_location[0]][idou_list[i]]) ** delta #現在の時刻からの∆がヒューリスティック値
             #p = ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma
             kakuritsu_list.append(p)
             sum +=p
         else:
-            p = (idou_probability[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
+            p = (idou_probability[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * ((1 / (l[idou_list[i]] - now_location[0])) ** theta) * (pheromon[now_location[0]][idou_list[i]])**delta
             #p = (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
             kakuritsu_list.append(p)
             sum += p
@@ -690,10 +690,10 @@ def min_route(route,riyoukokyaku_number,penalty_sum_list):
              new_route = copy.deepcopy(check_route)
     return new_route
 
-def insert_remaining_node(Loot,drop_remaining_node,remaining_node,loot_without_time):#remaining_node:取り残されたノードのこと、drop_remaining_node:降ろすポイントだけ挿入できなかったノード
+def insert_remaining_node(route,drop_remaining_node,remaining_node,loot_without_time):#remaining_node:取り残されたノードのこと、drop_remaining_node:降ろすポイントだけ挿入できなかったノード
     '''
     残ったノードを挿入する関数
-    :param Loot: list
+    :param route: list
         総ルート
     :param drop_remaining_node:list
         残っている降ろすノード
@@ -728,7 +728,14 @@ def insert_remaining_node(Loot,drop_remaining_node,remaining_node,loot_without_t
     print(penalty_sum_list)
     return loot_without_time,penalty_list,penalty_sum_list
 
+def pheromon_upgrade(route,pheromon,penalty_sum_list):
+    pheromon=pheromon*rou
+    for i in range(len(route)):
+        for j in range(len(route[i])-1):
+            pheromon[route[i][j]][route[i][j+1]] +=1/penalty_sum_list[i]
 
+    print(1)
+    return pheromon
 if __name__ == '__main__':
     FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
@@ -743,6 +750,7 @@ if __name__ == '__main__':
     l = Setting_Info[5]  # delay time
     d = 5  # 乗り降りにようする時間
     noriori = Setting_Info[6] #乗り降り0-1決定変数
+    kokyaku_node = range(1, n)
 
     time_expand = 1
 
@@ -755,9 +763,11 @@ if __name__ == '__main__':
     beta=1
     theta = 1
     ganma =0.7
+    delta =1
     keisu=np.ones(4)
     Q =1
     pheromon = np.ones((n,n))
+    rou=0.9
 #-----------------------------------------------------------------
     print(FILENAME)
     print(time_expand)
@@ -825,22 +835,14 @@ if __name__ == '__main__':
 
         misounyu_2.append(kanryo_node)
 
+        insert_ROUTE = insert_remaining_node(loot, pick_now_node_list, list(set(kokyaku_node) ^ set(sum(misounyu_2, []))),loot_out_time)
+        route_without_time = insert_ROUTE[0]
+        penalty_list=insert_ROUTE[1]
+        penalty_sum_list=insert_ROUTE[2]
 
+        pheromon = pheromon_upgrade(route_without_time,pheromon,penalty_sum_list)
         roop +=1
         if roop ==1:
             break
-    print(loot)
-    print(total_distance(loot))
-    print(pick_now_node_list)
-    syaryo =0
-    for i in range(len(loot)):
-        if not loot[i] ==[]:
-            syaryo +=1
-    print(syaryo)
-    kokyaku_node = range(1,n)
-    print(sum(misounyu_2,[]))
-    print(set(kokyaku_node)^set(sum(misounyu_2,[])))
-    print(len(set(kokyaku_node)^set(sum(misounyu_2,[]))))
-    print(loot_out_time)
-    aa = insert_remaining_node(loot,pick_now_node_list,list(set(kokyaku_node)^set(sum(misounyu_2,[]))),loot_out_time)
+    print(pheromon)
     #np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
