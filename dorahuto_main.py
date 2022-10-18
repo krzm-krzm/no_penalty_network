@@ -736,8 +736,18 @@ def pheromon_upgrade(route,pheromon,penalty_sum_list):
 
     print(1)
     return pheromon
+
+def penalty_check(penalty_list):
+    flag=0
+    sum=0
+    for i in range(len(penalty_list)):
+        sum += penalty_list[i][1]+penalty_list[i][2]+penalty_list[i][3]+penalty_list[i][4]
+    if not sum == 0:
+        flag=1
+    return flag
+
 if __name__ == '__main__':
-    FILENAME = 'darp01EX.txt'
+    FILENAME = 'darp02EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo =int(Setting_Info_base[0]) #車両数
@@ -759,11 +769,11 @@ if __name__ == '__main__':
 
     G_copy = copy.deepcopy(G)
 #----------------------パラメータ-------------------------------------
-    alpha =1
-    beta=1
-    theta = 1
-    ganma =0.7
-    delta =1
+    alpha =1    #1/(移動先の時刻𝑡)ー（現在の時刻𝑡）移動先の時間を優先
+    beta=0.7  #ノード間の距離を優先
+    theta = 1   #1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(pick-up)の締め切り時間を優先
+    ganma =0.7  #1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(drop)の締め切り時間を優先
+    delta =1    #フェロモンを優先
     keisu=np.ones(4)
     Q =1
     pheromon = np.ones((n,n))
@@ -774,11 +784,14 @@ if __name__ == '__main__':
     print(nx.number_of_edges(G))
     print(nx.number_of_nodes(G))
     roop =0
-    data = np.zeros((500,2))
     opt = 10000
+    kinbo=10000
     opt_loot =[]
-    misounyu =[]
-    misounyu_2 =[]
+    opt_info =[]
+
+    LOOP=50
+    data =np.zeros((LOOP,2))
+
 
     loop_nukedashi = np.zeros(Syaryo)
 
@@ -786,7 +799,8 @@ if __name__ == '__main__':
     while True:
         G = copy.deepcopy(G_copy)
         main_loop = 0
-
+        misounyu = []
+        misounyu_2 = []
         loot = [[] * 1 for i in range(Syaryo)]
         loot_out_time =[[] * 1 for i in range(Syaryo)]
         genzaichi_list =[(0,0) * 1 for i in range(Syaryo)]
@@ -840,9 +854,22 @@ if __name__ == '__main__':
         penalty_list=insert_ROUTE[1]
         penalty_sum_list=insert_ROUTE[2]
 
+        if sum(penalty_sum_list) < kinbo:
+            kinbo=sum(penalty_sum_list)
+            kinbo_loot=route_without_time
+            kinbo_info =penalty_list
+            data[roop][0] = kinbo
+        if sum(penalty_sum_list) < opt and penalty_check(penalty_list)==0:
+            opt = sum(penalty_sum_list)
+            opt_loot= route_without_time
+            opt_info = penalty_list
+            data[roop][1] = opt
         pheromon = pheromon_upgrade(route_without_time,pheromon,penalty_sum_list)
         roop +=1
-        if roop ==1:
+        if roop ==LOOP:
             break
     print(pheromon)
-    #np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
+    print(opt)
+    print(opt_loot)
+    print(opt_info)
+    np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")

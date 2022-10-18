@@ -559,6 +559,7 @@ if __name__ == '__main__':
     l = Setting_Info[5]  # delay time
     d = 5  # 乗り降りにようする時間
     noriori = Setting_Info[6]
+    kokyaku_node = range(1, n)
 
     time_expand = 1
 
