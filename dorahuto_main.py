@@ -491,6 +491,7 @@ def cal_kakuritsu(now_location, idou_list, idou_probability):
                         (1 / (l[idou_list[i]] - now_location[0])) ** theta) * (
                 pheromon[now_location[0]][idou_list[i]]) ** delta
             # p = (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
+
             kakuritsu_list.append(p)
             sum += p
     for i in range(len(kakuritsu_list)):
@@ -767,7 +768,7 @@ def penalty_check(penalty_list):
     return flag
 
 if __name__ == '__main__':
-    FILENAME = 'darp02EX.txt'
+    FILENAME = 'darp03EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]  # ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo = int(Setting_Info_base[0])  # 車両数
@@ -778,7 +779,7 @@ if __name__ == '__main__':
     Distance = Setting_Info[3]  # 距離
     e = Setting_Info[4]  # early time
     l = Setting_Info[5]  # delay time
-    d = 3  # 乗り降りにようする時間
+    d = 5  # 乗り降りにようする時間
     noriori = Setting_Info[6]  # 乗り降り0-1決定変数
     kokyaku_node = range(1, n)
 
@@ -879,7 +880,7 @@ if __name__ == '__main__':
             kinbo = sum(penalty_sum_list)
             kinbo_loot = route_without_time
             kinbo_info = penalty_list
-            data[roop][0] = kinbo
+        data[roop][0] = kinbo
         if sum(penalty_sum_list) < opt and penalty_check(penalty_list) == 0:
             opt = sum(penalty_sum_list)
             opt_loot = route_without_time
