@@ -1119,4 +1119,4 @@ if __name__ == '__main__':
     print(opt)
     print(opt_loot)
     print(opt_info)
-    np.savetxt('/home/kurozumi/デスクトップ/data/' + FILENAME + 'testans.csv', data, delimiter=",")
+    np.savetxt('/home/kurozumi/デスクトップ/data/dorahuto_tabu/' + FILENAME + 'testans.csv', data, delimiter=",")

@@ -748,6 +748,7 @@ def penalty_check(penalty_list):
     return flag
 
 if __name__ == '__main__':
+    t1= time.time()
     FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
@@ -790,8 +791,8 @@ if __name__ == '__main__':
     opt_loot =[]
     opt_info =[]
 
-    LOOP=50
-    data =np.zeros((LOOP,2))
+    LOOP=100
+    data =np.zeros((LOOP,3))
 
 
     loop_nukedashi = np.zeros(Syaryo)
@@ -843,12 +844,14 @@ if __name__ == '__main__':
             kinbo=sum(penalty_sum_list)
             kinbo_loot=route_without_time
             kinbo_info =penalty_list
-            data[roop][0] = kinbo
+        data[roop][0] = kinbo
         if sum(penalty_sum_list) < opt and penalty_check(penalty_list)==0:
             opt = sum(penalty_sum_list)
             opt_loot= route_without_time
             opt_info = penalty_list
             data[roop][1] = opt
+        t2 = time.time()
+        data[roop][2] = t2-t1
         pheromon = pheromon_upgrade(route_without_time,pheromon,penalty_sum_list)
         roop +=1
         if roop ==LOOP:
@@ -857,3 +860,4 @@ if __name__ == '__main__':
     print(opt)
     print(opt_loot)
     print(opt_info)
+    np.savetxt('/home/kurozumi/デスクトップ/data/No_dortahuto/' + FILENAME + 'ans.csv', data, delimiter=",")
