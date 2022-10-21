@@ -481,14 +481,14 @@ def cal_kakuritsu(now_location, idou_list, idou_probability):
         if noriori[idou_list[i]] == -1:
             # p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]]+1/(l[idou_list[i]]-e[idou_list[i]]))**beta)#時間窓がヒューリスティック値
             p = (idou_probability[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (
-                        (1 / (l[idou_list[i]] - now_location[0])) ** ganma) * (
+                        (1 / (l[idou_list[i]] - now_location[1])) ** ganma) * (
                 pheromon[now_location[0]][idou_list[i]]) ** delta  # 現在の時刻からの∆がヒューリスティック値
             # p = ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma
             kakuritsu_list.append(p)
             sum += p
         else:
             p = (idou_probability[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (
-                        (1 / (l[idou_list[i]] - now_location[0])) ** theta) * (
+                        (1 / (l[idou_list[i]] - now_location[1])) ** theta) * (
                 pheromon[now_location[0]][idou_list[i]]) ** delta
             # p = (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
             kakuritsu_list.append(p)

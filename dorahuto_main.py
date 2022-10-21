@@ -481,17 +481,16 @@ def cal_kakuritsu(now_location, idou_list, idou_probability):
         if noriori[idou_list[i]] == -1:
             # p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]]+1/(l[idou_list[i]]-e[idou_list[i]]))**beta)#時間窓がヒューリスティック値
             p = (idou_probability[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (
-                        (1 / (l[idou_list[i]] - now_location[0])) ** ganma) * (
+                        (1 / (l[idou_list[i]] - now_location[1])) ** ganma) * (
                 pheromon[now_location[0]][idou_list[i]]) ** delta  # 現在の時刻からの∆がヒューリスティック値
             # p = ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma
             kakuritsu_list.append(p)
             sum += p
         else:
             p = (idou_probability[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (
-                        (1 / (l[idou_list[i]] - now_location[0])) ** theta) * (
+                        (1 / (l[idou_list[i]] - now_location[1])) ** theta) * (
                 pheromon[now_location[0]][idou_list[i]]) ** delta
             # p = (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
-
             kakuritsu_list.append(p)
             sum += p
     for i in range(len(kakuritsu_list)):
@@ -768,7 +767,7 @@ def penalty_check(penalty_list):
     return flag
 
 if __name__ == '__main__':
-    FILENAME = 'darp03EX.txt'
+    FILENAME = 'darp04EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]  # ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo = int(Setting_Info_base[0])  # 車両数
@@ -810,7 +809,7 @@ if __name__ == '__main__':
     opt_loot = []
     opt_info = []
 
-    LOOP = 50
+    LOOP = 1
     data = np.zeros((LOOP, 2))
 
     loop_nukedashi = np.zeros(Syaryo)
@@ -894,4 +893,4 @@ if __name__ == '__main__':
     print(opt)
     print(opt_loot)
     print(opt_info)
-    np.savetxt('/home/kurozumi/デスクトップ/data/' + FILENAME + 'ans.csv', data, delimiter=",")
+    #np.savetxt('/home/kurozumi/デスクトップ/data/' + FILENAME + 'ans.csv', data, delimiter=",")
