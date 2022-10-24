@@ -1028,7 +1028,7 @@ if __name__ == '__main__':
     opt_loot = []
     opt_info = []
 
-    LOOP = 5
+    LOOP = 2
     data = np.zeros((LOOP, 3))
 
     loop_nukedashi = np.zeros(Syaryo)
@@ -1092,7 +1092,7 @@ if __name__ == '__main__':
                                              list(set(kokyaku_node) ^ set(sum(misounyu_2, []))), loot_out_time)
         route_without_time = insert_ROUTE[0]
 
-        Saiteki_route = main(30,route_without_time)
+        Saiteki_route = main(100,route_without_time)
         saiteki_route = Saiteki_route[0]
         saiteki = Saiteki_route[1]
         Pena_route= pena_cal(saiteki_route)
@@ -1119,4 +1119,4 @@ if __name__ == '__main__':
     print(opt)
     print(opt_loot)
     print(opt_info)
-    np.savetxt('/home/kurozumi/デスクトップ/data/dorahuto_tabu/' + FILENAME + 'testans.csv', data, delimiter=",")
+    np.savetxt('/home/kurozumi/デスクトップ/data/dorahuto_tabu/' + FILENAME + '2testans.csv', data, delimiter=",")
