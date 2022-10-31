@@ -612,12 +612,14 @@ def penalty_sum_route_k(route_k):
     :return: list
         各ペナルティーをリストにしたもの
     '''
-    c_s = route_k_cost_sum(route_k)
-    q_s = capacity_route_k(route_k)
+    c_s = 0
+    q_s = 0
     d_s = 0
     w_s = 0
     t_s = 0
     if not len(route_k) == 0:
+        c_s = route_k_cost_sum(route_k)
+        q_s = capacity_route_k(route_k)
         ROUTE_TIME_info = time_caluculation(route_k)
         d_s_s = (ROUTE_TIME_info[1][-1] - ROUTE_TIME_info[1][route_k[1]] + Distance[0][route_k[1]]) - \
                 Setting_Info_base[8]
@@ -752,7 +754,8 @@ def pheromon_upgrade(route, pheromon, penalty_sum_list):
     pheromon = pheromon * rou
     for i in range(len(route)):
         for j in range(len(route[i]) - 1):
-            pheromon[route[i][j]][route[i][j + 1]] += 1 / penalty_sum_list[i]
+            if not penalty_sum_list[i] ==0:
+                pheromon[route[i][j]][route[i][j + 1]] += 1 / penalty_sum_list[i]
 
     print(1)
     return pheromon
@@ -899,6 +902,7 @@ def tabu_update_ver2(kinsi,tabu_list,neighbour):    #kinsiはその近傍を何�
             tabu_list[i][2] = tabu_list[i][2] - 1
 
 def main(Loop,initial_Route):
+    t_main = time.time()
     equ =0
     syoki = copy.deepcopy(initial_Route)
     saiteki_route = copy.deepcopy(initial_Route)
@@ -914,6 +918,7 @@ def main(Loop,initial_Route):
     kinbo_cost = float('inf')
     syutyu_loop = 0
     saisyo = 0
+    data2 = np.zeros((Loop, 2))
     while True:
         skip = 0
         best_neighbour = np.zeros(2)
@@ -950,6 +955,7 @@ def main(Loop,initial_Route):
         if np.sum(penalty_sum(saiteki_route)[1]) ==0 and saisyo ==0:
             saisyo =1
             print(loop)
+            print(time.time()-t_main)
 
         tabu_update_ver2(kinsi, tabu_list, best_neighbour)
         kinbo_cost = float('inf')
@@ -957,10 +963,13 @@ def main(Loop,initial_Route):
         initial_Route = copy.deepcopy(NextRoute)
         keisu_update(delta,penalty_sum(NextRoute)[1])
         parameta_loop += 1
+
+
         if parameta_loop == 10:
             delta = np.random.uniform(0, 0.5)
             parameta_loop = 0
-
+        data2[loop][1] = Opt
+        data2[loop][0] = time.time() - t1
         loop += 1
         if loop == Loop or equ ==100:
             break
@@ -971,7 +980,7 @@ def main(Loop,initial_Route):
     print(saiteki)
     print(penalty_sum(saiteki_route)[1])
     print(keisu)
-
+    np.savetxt('/home/kurozumi/デスクトップ/data/check' + FILENAME + '.csv', data2, delimiter=",")
     return saiteki_route,saiteki
 
 def pena_cal(route):
@@ -1009,9 +1018,9 @@ if __name__ == '__main__':
     G_copy = copy.deepcopy(G)
     # ----------------------パラメータ-------------------------------------
     alpha = 1  # 1/(移動先の時刻𝑡)ー（現在の時刻𝑡）移動先の時間を優先
-    beta = 0.7  # ノード間の距離を優先
+    beta = 1  # ノード間の距離を優先
     theta = 1  # 1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(pick-up)の締め切り時間を優先
-    ganma = 0.7  # 1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(drop)の締め切り時間を優先
+    ganma = 1  # 1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(drop)の締め切り時間を優先
     delta = 1  # フェロモンを優先
     keisu = [50,50,50,50]
     Q = 1
@@ -1023,12 +1032,14 @@ if __name__ == '__main__':
     print(nx.number_of_edges(G))
     print(nx.number_of_nodes(G))
     roop = 0
+
     opt = 10000
     kinbo = 10000
     opt_loot = []
     opt_info = []
 
-    LOOP = 2
+    LOOP = 1
+    M_loop =100
     data = np.zeros((LOOP, 3))
 
     loop_nukedashi = np.zeros(Syaryo)
@@ -1092,7 +1103,7 @@ if __name__ == '__main__':
                                              list(set(kokyaku_node) ^ set(sum(misounyu_2, []))), loot_out_time)
         route_without_time = insert_ROUTE[0]
 
-        Saiteki_route = main(100,route_without_time)
+        Saiteki_route = main(M_loop,route_without_time)
         saiteki_route = Saiteki_route[0]
         saiteki = Saiteki_route[1]
         Pena_route= pena_cal(saiteki_route)
@@ -1110,6 +1121,7 @@ if __name__ == '__main__':
             opt_info = penalty_list
             data[roop][1] = opt
         t2= time.time()
+        print(t2-t1)
         data[roop][2] = t2-t1
         pheromon = pheromon_upgrade(route_without_time, pheromon, penalty_sum_list)
         roop += 1
