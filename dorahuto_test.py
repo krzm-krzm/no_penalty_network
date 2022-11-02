@@ -629,7 +629,7 @@ def penalty_sum_route_k(route_k):
         w_s = time_window_penalty(route_k, ROUTE_TIME_info[1])
         t_s = ride_time_penalty(ROUTE_TIME_info[4])
     # penalty = c_s + keisu[0] * q_s + keisu[1] * d_s + keisu[2] * w_s + keisu[3] * t_s
-    penalty = [c_s, q_s, d_s, w_s, t_s]
+    penalty = [c_s, keisu[0]*q_s, keisu[1]*d_s, keisu[2]*w_s, keisu[3]*t_s]
     return penalty
 
 def insert_route_ver2(route, riyoukyakunumber, new_vehiclenumber):
@@ -901,6 +901,46 @@ def tabu_update_ver2(kinsi,tabu_list,neighbour):    #kinsiはその近傍を何�
         if tabu_list[i][2] >= 0:
             tabu_list[i][2] = tabu_list[i][2] - 1
 
+def swap(route, requestnode, tabu_list, best_neighbour):
+    max = 0
+    min = 1000
+    min_no = 0
+    max_no = 0
+    change = []
+    vhiecle = len(route)
+    vhiecle_list = np.zeros(vhiecle)
+    for i in range(vhiecle):
+        vhiecle_list[i] = sum(penalty_sum_route_k(route[i]))
+    max_no = np.argmax(vhiecle_list)
+    min_no = np.argmin(vhiecle_list)
+    max = vhiecle_list[max_no]
+    min = vhiecle_list[min_no]
+    """
+
+    for i in range(len(route)):  # 初期解
+        if max <= penalty_sum_route_k(route[i], requestnode):
+            max = penalty_sum_route_k(route[i], requestnode)
+            max_no = i
+        if min >= penalty_sum_route_k(route[i], requestnode):
+            min = penalty_sum_route_k(route[i], requestnode)
+            min_no = i
+    """
+    for i in range(len(route[max_no])):
+        if route[max_no][i] <= int(requestnode / 2):
+            change_no = route[max_no][i]
+            check = tabu_check(route[max_no][i], min_no, tabu_list)
+            if not check > 0:
+                NEWroute = copy.deepcopy(newRoute_ver2(route, requestnode, change_no, max_no, min_no))
+                if change == [] or penalty_sum(NEWroute)[0] < penalty_sum(change)[0]:
+                    change = copy.deepcopy(NEWroute)
+                    best_neighbour[0] = change_no
+                    best_neighbour[1] = max_no
+
+    if change == []:
+        change = copy.deepcopy(route)
+
+    return change, best_neighbour
+
 def main(Loop,initial_Route):
     t_main = time.time()
     equ =0
@@ -961,6 +1001,8 @@ def main(Loop,initial_Route):
         kinbo_cost = float('inf')
 
         initial_Route = copy.deepcopy(NextRoute)
+        swap_route = copy.deepcopy(swap(initial_Route, n, tabu_list, best_neighbour))
+        initial_Route = copy.deepcopy(swap_route[0])
         keisu_update(delta,penalty_sum(NextRoute)[1])
         parameta_loop += 1
 
@@ -970,8 +1012,12 @@ def main(Loop,initial_Route):
             parameta_loop = 0
         data2[loop][1] = Opt
         data2[loop][0] = time.time() - t1
+        if data2[loop][1] == data2[loop - 1][1]:
+            equ += 1
+        else:
+            equ = 0
         loop += 1
-        if loop == Loop or equ ==100:
+        if loop == Loop or equ ==50:
             break
 
     print(syoki)
@@ -995,7 +1041,7 @@ def pena_cal(route):
 
 if __name__ == '__main__':
     t1 = time.time()
-    FILENAME = 'darp03EX.txt'
+    FILENAME = 'darp05EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]  # ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo = int(Setting_Info_base[0])  # 車両数
@@ -1039,7 +1085,7 @@ if __name__ == '__main__':
     opt_info = []
 
     LOOP = 1
-    M_loop =100
+    M_loop =1000
     data = np.zeros((LOOP, 3))
 
     loop_nukedashi = np.zeros(Syaryo)
