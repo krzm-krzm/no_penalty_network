@@ -45,7 +45,7 @@ def Setting(FILENAME):
             乗り降り決定変数
     '''
     mat = []
-    with open('/home/kurozumi/デスクトップ/benchmark2/' + FILENAME, 'r', encoding='utf-8') as fin:
+    with open('/home/kurozumi/デスクトップ/shin_darpbench/' + FILENAME, 'r', encoding='utf-8') as fin:
         for line in fin.readlines():
             row = []
             toks = line.split()
@@ -1059,7 +1059,7 @@ if __name__ == '__main__':
     time_expand = 1
 
     FILENAME = FILENAME.replace('.txt', '')
-    G = nx.read_gpickle('time_network' + FILENAME)
+    G = nx.read_gpickle('time_network2' + FILENAME)
 
     G_copy = copy.deepcopy(G)
     # ----------------------パラメータ-------------------------------------
@@ -1084,7 +1084,7 @@ if __name__ == '__main__':
     opt_loot = []
     opt_info = []
 
-    LOOP = 1
+    LOOP = 3
     M_loop =1000
     data = np.zeros((LOOP, 3))
 

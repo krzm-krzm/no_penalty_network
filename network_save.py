@@ -46,7 +46,7 @@ def Setting(FILENAME):
             乗り降り決定変数
     '''
     mat = []
-    with open('/home/kurozumi/デスクトップ/benchmark2/' + FILENAME, 'r', encoding='utf-8') as fin:
+    with open('/home/kurozumi/デスクトップ/shin_darpbench/' + FILENAME, 'r', encoding='utf-8') as fin:
         for line in fin.readlines():
             row = []
             toks = line.split()
@@ -214,7 +214,7 @@ def network_creat(Time_expand):
     return G
 
 if __name__ == '__main__':
-    FILENAME = 'darp20EX.txt'
+    FILENAME = 'darp05EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo =int(Setting_Info_base[0]) #車両数
@@ -234,4 +234,4 @@ if __name__ == '__main__':
     t2= time.time()
     print(t2-t1)
     FILENAME=FILENAME.replace('.txt','')
-    nx.write_gpickle(G,'time_network'+FILENAME)
+    nx.write_gpickle(G,'time_network2'+FILENAME)
