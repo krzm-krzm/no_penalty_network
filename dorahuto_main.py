@@ -461,13 +461,23 @@ def cal_kakuritsu(now_location, idou_list, idou_probability):
     for i in range(len(idou_probability)):
         if noriori[idou_list[i]]==-1:
             #p = (pheromon[i]**alpha)*((Q/Distance[idou_list[i]][now_location[0]]+1/(l[idou_list[i]]-e[idou_list[i]]))**beta)#時間窓がヒューリスティック値
-            p = (idou_probability[i] ** alpha) * ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * ((1 / (l[idou_list[i]] - now_location[0])) ** ganma) * (pheromon[now_location[0]][idou_list[i]]) ** delta #現在の時刻からの∆がヒューリスティック値
+            #p = round(idou_probability[i] ** alpha,5) * round(((Q / Distance[idou_list[i]][now_location[0]]) ** beta,5) * round((1 / (l[idou_list[i]] - now_location[0])) ** ganma,5) * round((pheromon[now_location[0]][idou_list[i]]) ** delta,5) #現在の時刻からの∆がヒューリスティック値
             #p = ((Q / Distance[idou_list[i]][now_location[0]]) ** beta) * (1 / (l[idou_list[i]] - now_location[0])) ** ganma
+            Probability = round(idou_probability[i] ** alpha,5)
+            kyori= round((Q / Distance[idou_list[i]][now_location[0]]) ** beta,5)
+            simekiri = round((1 / (l[idou_list[i]] - now_location[1])) ** ganma,5)
+            phe=round((pheromon[now_location[0]][idou_list[i]]) ** delta, 5)
+            p=Probability*kyori*simekiri*phe
             kakuritsu_list.append(p)
             sum +=p
         else:
-            p = (idou_probability[i] ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * ((1 / (l[idou_list[i]] - now_location[0])) ** theta) * (pheromon[now_location[0]][idou_list[i]])**delta
+            #p = ((idou_probability[i]*100) ** alpha) * (Q / Distance[idou_list[i]][now_location[0]]) ** beta * ((1 / (l[idou_list[i]] - now_location[0]))*100 ** theta) * (pheromon[now_location[0]][idou_list[i]]*100)**delta
             #p = (Q / Distance[idou_list[i]][now_location[0]]) ** beta * (1 / (l[idou_list[i]] - now_location[0])) ** theta
+            Probability = round(idou_probability[i] ** alpha, 5)
+            kyori = round((Q / Distance[idou_list[i]][now_location[0]]) ** beta, 5)
+            simekiri = round((1 / (l[idou_list[i]] - now_location[1])) ** theta, 5)
+            phe = round((pheromon[now_location[0]][idou_list[i]]) ** delta, 5)
+            p = Probability * kyori * simekiri * phe
             kakuritsu_list.append(p)
             sum += p
     for i in range(len(kakuritsu_list)):
@@ -747,7 +757,7 @@ def penalty_check(penalty_list):
     return flag
 
 if __name__ == '__main__':
-    FILENAME = 'darp02EX.txt'
+    FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo =int(Setting_Info_base[0]) #車両数
@@ -789,7 +799,7 @@ if __name__ == '__main__':
     opt_loot =[]
     opt_info =[]
 
-    LOOP=50
+    LOOP=1
     data =np.zeros((LOOP,2))
 
 

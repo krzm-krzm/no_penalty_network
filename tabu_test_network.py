@@ -959,10 +959,18 @@ def main(Loop,initial_Route):
     syutyu_loop = 0
     saisyo = 0
     data2 = np.zeros((Loop, 2))
+    each_penalty = np.zeros(Syaryo)
+    loop_riyo_list = [[] for i in range(Syaryo)]
     while True:
         skip = 0
         best_neighbour = np.zeros(2)
         riyoukyaku_list = np.arange(1,n/2)
+        for newloop in range(Syaryo):
+            each_penalty[newloop] = sum(penalty_sum_route_k(initial_Route[newloop]))
+        each_penalty_sort = np.argsort(-each_penalty)
+        for newloop in each_penalty_sort:
+            loop_riyo_list[newloop] = initial_Route[each_penalty_sort.index(newloop)]
+
         for i in riyoukyaku_list:
             syaryo_loop = np.arange(Syaryo)
             syaryo_loop = np.delete(syaryo_loop,int(syaryo_tokutei(initial_Route,i)))
@@ -1042,7 +1050,7 @@ def pena_cal(route):
 
 if __name__ == '__main__':
     t1 = time.time()
-    FILENAME = 'darp04EX.txt'
+    FILENAME = 'darp01EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]  # ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo = int(Setting_Info_base[0])  # 車両数
@@ -1086,7 +1094,7 @@ if __name__ == '__main__':
     opt_info = []
 
     LOOP = 1
-    M_loop =1000
+    M_loop =10
     data = np.zeros((LOOP, 3))
 
     loop_nukedashi = np.zeros(Syaryo)
