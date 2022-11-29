@@ -757,9 +757,10 @@ def penalty_check(penalty_list):
     return flag
 
 if __name__ == '__main__':
-    mokuteki_kansu = np.zeros(50)
-    kazu = np.zeros(50)
-    for a in range(50):
+    ganbare=30
+    mokuteki_kansu = np.zeros(ganbare)
+    kazu = np.zeros(ganbare)
+    for a in range(ganbare):
         FILENAME = 'darp03EX.txt'
         Setting_Info = Setting(FILENAME)
         Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
@@ -782,7 +783,7 @@ if __name__ == '__main__':
 
         G_copy = copy.deepcopy(G)
     #----------------------パラメータ-------------------------------------
-        alpha =1    #1/(移動先の時刻𝑡)ー（現在の時刻𝑡）移動先の時間を優先
+        alpha =0.9    #1/(移動先の時刻𝑡)ー（現在の時刻𝑡）移動先の時間を優先
         beta=1  #ノード間の距離を優先
         theta = 1   #1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(pick-up)の締め切り時間を優先
         ganma =1  #1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(drop)の締め切り時間を優先
