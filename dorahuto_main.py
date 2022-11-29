@@ -16,7 +16,7 @@ def distance(x1, x2, y1, y2):
 
 def Setting(FILENAME):
     mat = []
-    with open('/Users/kurozumi ryouho/Desktop/benchmark2/' + FILENAME, 'r', encoding='utf-8') as fin:
+    with open('/Users/kurozumi ryouho/Desktop/shin_darpbench/' + FILENAME, 'r', encoding='utf-8') as fin:
         for line in fin.readlines():
             row = []
             toks = line.split()
@@ -757,7 +757,7 @@ def penalty_check(penalty_list):
     return flag
 
 if __name__ == '__main__':
-    FILENAME = 'darp01EX.txt'
+    FILENAME = 'darp03EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0] #ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo =int(Setting_Info_base[0]) #車両数
@@ -785,9 +785,9 @@ if __name__ == '__main__':
     ganma =0.7  #1/(ノード𝑗の最遅時間窓)ー(現在の時刻𝑡）移動先(drop)の締め切り時間を優先
     delta =1    #フェロモンを優先
     keisu=np.ones(4)
-    Q =1
+    Q =1    #ヒューリスティック値
     pheromon = np.ones((n,n))
-    rou=0.9
+    rou=0.9 #蒸発率
 #-----------------------------------------------------------------
     print(FILENAME)
     print(time_expand)
@@ -874,12 +874,12 @@ if __name__ == '__main__':
             opt_loot= route_without_time
             opt_info = penalty_list
             data[roop][1] = opt
-        pheromon = pheromon_upgrade(route_without_time,pheromon,penalty_sum_list)
+        #pheromon = pheromon_upgrade(route_without_time,pheromon,penalty_sum_list)
         roop +=1
         if roop ==LOOP:
             break
-    print(pheromon)
+    #print(pheromon)
     print(opt)
     print(opt_loot)
     print(opt_info)
-    np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
+    #np.savetxt('/Users/kurozumi ryouho/Desktop/benchmark2/kekka/' + FILENAME + 'ans.csv', data, delimiter=",")
