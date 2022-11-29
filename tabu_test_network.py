@@ -1053,7 +1053,7 @@ def pena_cal(route):
 
 if __name__ == '__main__':
     t1 = time.time()
-    FILENAME = 'darp02EX.txt'
+    FILENAME = 'darp03EX.txt'
     Setting_Info = Setting(FILENAME)
     Setting_Info_base = Setting_Info[0]  # ベンチマーク問題の１行目（設定情報）を抜き出した変数
     Syaryo = int(Setting_Info_base[0])  # 車両数

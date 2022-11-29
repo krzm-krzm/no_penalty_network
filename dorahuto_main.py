@@ -45,7 +45,7 @@ def Setting(FILENAME):
             乗り降り決定変数
     '''
     mat = []
-    with open('/home/kurozumi/デスクトップ/benchmark2/' + FILENAME, 'r', encoding='utf-8') as fin:
+    with open('/home/kurozumi/デスクトップ/shin_darpbench/' + FILENAME, 'r', encoding='utf-8') as fin:
         for line in fin.readlines():
             row = []
             toks = line.split()
@@ -810,7 +810,7 @@ if __name__ == '__main__':
     opt_loot = []
     opt_info = []
 
-    LOOP = 100
+    LOOP = 1
     data = np.zeros((LOOP, 3))
 
     loop_nukedashi = np.zeros(Syaryo)
