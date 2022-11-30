@@ -755,7 +755,7 @@ def pheromon_upgrade(route, pheromon, penalty_sum_list):
     for i in range(len(route)):
         for j in range(len(route[i]) - 1):
             if not penalty_sum_list[i] ==0:
-                pheromon[route[i][j]][route[i][j + 1]] += 1 / penalty_sum_list[i]
+                pheromon[route[i][j]][route[i][j + 1]] += Q_2 / penalty_sum_list[i]
 
     print(1)
     return pheromon
@@ -1084,6 +1084,8 @@ if __name__ == '__main__':
     Q = 1
     pheromon = np.ones((n, n))
     rou = 0.9
+
+    Q_2 = 1 #フェロモン更新時のQ値
     # -----------------------------------------------------------------
     print(FILENAME)
     print(time_expand)
